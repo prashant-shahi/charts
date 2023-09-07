@@ -148,6 +148,7 @@ receivers:
       {{- toYaml .Values.presets.clusterMetrics.nodeConditionsToReport | nindent 6 }}
     allocatable_types_to_report:
       {{- toYaml .Values.presets.clusterMetrics.allocatableTypesToReport | nindent 6 }}
+    ignore_deprecated_resource: {{ default false .Values.presets.clusterMetrics.ignoreDeprecatedResource }}
 {{- end }}
 
 {{- define "opentelemetry-collector.applyHostMetricsConfig" -}}

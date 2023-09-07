@@ -251,6 +251,7 @@ presets:
       - memory
       # - ephemeral-storage
       # - storage
+    ignoreDeprecatedResource: false
   resourceDetectionInternal:
     enabled: true
     timeout: 2s
@@ -295,7 +296,7 @@ otelAgent:
   # OpenTelemetry Collector executable
   command:
     # -- OtelAgent command name
-    name: /otelcol-contrib
+    name: /otelcontribcol
     # -- OtelAgent command extra arguments
     extraArgs: []
 
@@ -638,7 +639,7 @@ otelDeployment:
   # OpenTelemetry Collector executable
   command:
     # -- OtelDeployment command name
-    name: /otelcol-contrib
+    name: /otelcontribcol
     # -- OtelDeployment command extra arguments
     extraArgs: []
 

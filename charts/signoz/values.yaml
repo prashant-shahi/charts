@@ -2376,6 +2376,7 @@ k8s-infra:
         - memory
         # - ephemeral-storage
         # - storage
+      ignoreDeprecatedResource: false
     resourceDetectionInternal:
       enabled: true
       timeout: 2s
@@ -2406,8 +2407,8 @@ k8s-infra:
     name: "otel-agent"
     image:
       registry: docker.io
-      repository: otel/opentelemetry-collector-contrib
-      tag: 0.79.0
+      repository: coolboi567/otelcontribcol
+      tag: 0.83.x
       pullPolicy: IfNotPresent
 
     # -- Image Registry Secret Names for OtelAgent.
@@ -2418,7 +2419,7 @@ k8s-infra:
     # OpenTelemetry Collector executable
     command:
       # -- OtelAgent command name
-      name: /otelcol-contrib
+      name: /otelcontribcol
       # -- OtelAgent command extra arguments
       extraArgs: []
 
@@ -2514,8 +2515,8 @@ k8s-infra:
     name: "otel-deployment"
     image:
       registry: docker.io
-      repository: otel/opentelemetry-collector-contrib
-      tag: 0.79.0
+      repository: coolboi567/otelcontribcol
+      tag: 0.83.x
       pullPolicy: IfNotPresent
 
     # -- Image Registry Secret Names for OtelDeployment.
@@ -2526,7 +2527,7 @@ k8s-infra:
     # OpenTelemetry Collector executable
     command:
       # -- OtelDeployment command name
-      name: /otelcol-contrib
+      name: /otelcontribcol
       # -- OtelDeployment command extra arguments
       extraArgs: []
 
