@@ -156,7 +156,7 @@ clickhouse:
   # @default -- See `values.yaml` for defaults
   resources:
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 200Mi
   #   limits:
   #     cpu: 2000m
@@ -548,7 +548,7 @@ queryService:
         doneMessage: "clickhouse ready, starting query service now"
       resources: {}
         # requests:
-        #   cpu: 100m
+        #   cpu: 50m
         #   memory: 100Mi
         # limits:
         #   cpu: 100m
@@ -569,7 +569,7 @@ queryService:
           echo "Migration completed"
       resources: {}
         # requests:
-        #   cpu: 100m
+        #   cpu: 50m
         #   memory: 100Mi
         # limits:
         #   cpu: 100m
@@ -651,7 +651,7 @@ queryService:
   # @default -- See `values.yaml` for defaults
   resources:
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 100Mi
     # limits:
     #   cpu: 750m
@@ -831,7 +831,7 @@ frontend:
   # @default -- See `values.yaml` for defaults
   resources:
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 100Mi
     # limits:
     #   cpu: 200m
@@ -907,7 +907,7 @@ alertmanager:
         doneMessage: "query-service ready, starting alertmanager now"
       resources: {}
         # requests:
-        #   cpu: 100m
+        #   cpu: 50m
         #   memory: 100Mi
         # limits:
         #   cpu: 100m
@@ -976,7 +976,7 @@ alertmanager:
   # @default -- See `values.yaml` for defaults
   resources:
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 100Mi
     # limits:
     #   cpu: 200m
@@ -1107,7 +1107,7 @@ alertmanager:
     # @default -- See `values.yaml` for defaults
     resources:
       requests:
-        cpu: 100m
+        cpu: 50m
         memory: 100Mi
       # limits:
       #   cpu: 200m
@@ -1195,7 +1195,7 @@ otelCollector:
         doneMessage: "clickhouse ready, starting otel collector now"
       resources: {}
         # requests:
-        #   cpu: 100m
+        #   cpu: 50m
         #   memory: 100Mi
         # limits:
         #   cpu: 100m
@@ -1409,7 +1409,7 @@ otelCollector:
   # @default -- See `values.yaml` for defaults
   resources:
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 200Mi
     # limits:
     #   cpu: "1"
@@ -1770,7 +1770,7 @@ otelCollectorMetrics:
         doneMessage: "clickhouse ready, starting otel collector metrics now"
       resources: {}
         # requests:
-        #   cpu: 100m
+        #   cpu: 50m
         #   memory: 100Mi
         # limits:
         #   cpu: 100m
@@ -1879,7 +1879,7 @@ otelCollectorMetrics:
   # @default -- See `values.yaml` for defaults
   resources:
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 100Mi
     # limits:
     #   cpu: "1"
@@ -2453,7 +2453,7 @@ k8s-infra:
     # @default -- See `values.yaml` for defaults
     resources:
       requests:
-        cpu: 100m
+        cpu: 50m
         memory: 100Mi
       # limits:
       #   cpu: 250m
@@ -2561,7 +2561,7 @@ k8s-infra:
     # @default -- See `values.yaml` for defaults
     resources:
       requests:
-        cpu: 100m
+        cpu: 50m
         memory: 100Mi
       # limits:
       #   cpu: 1000m

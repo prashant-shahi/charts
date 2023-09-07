@@ -539,7 +539,7 @@ otelAgent:
   # @default -- See `values.yaml` for defaults
   resources:
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 100Mi
     # limits:
     #   cpu: 1000m
@@ -804,7 +804,7 @@ otelDeployment:
   # @default -- See `values.yaml` for defaults
   resources:
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 100Mi
     # limits:
     #   cpu: 1000m
