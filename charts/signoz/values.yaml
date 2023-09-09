@@ -2376,7 +2376,6 @@ k8s-infra:
         - memory
         # - ephemeral-storage
         # - storage
-      ignoreDeprecatedResource: false
     resourceDetectionInternal:
       enabled: true
       timeout: 2s
@@ -2408,7 +2407,7 @@ k8s-infra:
     image:
       registry: docker.io
       repository: coolboi567/otelcontribcol
-      tag: 0.83.x
+      tag: 0.83.1
       pullPolicy: IfNotPresent
 
     # -- Image Registry Secret Names for OtelAgent.
@@ -2516,7 +2515,7 @@ k8s-infra:
     image:
       registry: docker.io
       repository: coolboi567/otelcontribcol
-      tag: 0.83.x
+      tag: 0.83.1
       pullPolicy: IfNotPresent
 
     # -- Image Registry Secret Names for OtelDeployment.
