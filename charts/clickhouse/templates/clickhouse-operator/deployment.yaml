@@ -1,14 +1,3 @@
-# Template Parameters:
-#
-# NAMESPACE={{ include "clickhouse.namespace" . }}
-# COMMENT=
-# OPERATOR_IMAGE={{ template "clickhouseOperator.image" . }}
-# OPERATOR_IMAGE_PULL_POLICY={{ .Values.clickhouseOperator.image.pullPolicy }}
-# METRICS_EXPORTER_IMAGE={{ include "metricsExporter.image" . }}
-# METRICS_EXPORTER_IMAGE_PULL_POLICY={{ .Values.clickhouseOperator.metricsExporter.image.pullPolicy }}
-#
-# Setup Deployment for clickhouse-operator
-# Deployment would be created in kubectl-specified namespace
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -16,6 +5,13 @@ metadata:
   namespace: {{ include "clickhouse.namespace" . }}
   labels:
     {{- include "clickhouseOperator.labels" . | nindent 4 }}
+    {{- if .Values.clickhouseOperator.labels }}
+    {{- toYaml .Values.clickhouseOperator.labels | nindent 4 }}
+    {{- end }}
+  {{- if .Values.clickhouseOperator.annotations }}
+  annotations:
+    {{- toYaml .Values.clickhouseOperator.annotations | nindent 4 }}
+  {{- end }}
 spec:
   replicas: 1
   selector:
@@ -27,9 +23,16 @@ spec:
         {{- with .Values.clickhouseOperator.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        checksum/config: {{ include (print $.Template.BasePath "/clickhouse-operator/configmap.yaml") . | sha256sum }}
+        checksum/files: {{ include (print $.Template.BasePath "/clickhouse-operator/configmaps/etc-files.yaml") . | sha256sum }}
+        checksum/confd-files: {{ include (print $.Template.BasePath "/clickhouse-operator/configmaps/etc-confd-files.yaml") . | sha256sum }}
+        checksum/configd-files: {{ include (print $.Template.BasePath "/clickhouse-operator/configmaps/etc-configd-files.yaml") . | sha256sum }}
+        checksum/templatesd-files: {{ include (print $.Template.BasePath "/clickhouse-operator/configmaps/etc-templatesd-files.yaml") . | sha256sum }}
+        checksum/usersd-files: {{ include (print $.Template.BasePath "/clickhouse-operator/configmaps/etc-usersd-files.yaml") . | sha256sum }}
       labels:
         {{- include "clickhouseOperator.selectorLabels" . | nindent 8 }}
+        {{- if .Values.clickhouseOperator.podLabels }}
+        {{- toYaml .Values.clickhouseOperator.podLabels | nindent 8 }}
+        {{- end }}
     spec:
       {{- include "clickhouseOperator.imagePullSecrets" . | indent 6 }}
       serviceAccountName: {{ include "clickhouseOperator.serviceAccountName" . }}
@@ -68,7 +71,7 @@ spec:
           configMap:
             name: {{ include "clickhouseOperator.fullname" . }}-etc-usersd-files
       containers:
-        - name: {{ include "clickhouseOperator.fullname" . }}
+        - name: operator
           image: {{ template "clickhouseOperator.image" . }}
           imagePullPolicy: {{ .Values.clickhouseOperator.image.pullPolicy }}
           volumeMounts:
@@ -83,57 +86,14 @@ spec:
             - name: etc-clickhouse-operator-usersd-folder
               mountPath: /etc/clickhouse-operator/users.d
           env:
-            # Pod-specific
-            # spec.nodeName: ip-172-20-52-62.ec2.internal
-            - name: OPERATOR_POD_NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
-            # metadata.name: clickhouse-operator-6f87589dbb-ftcsf
-            - name: OPERATOR_POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            # metadata.namespace: kube-system
-            - name: OPERATOR_POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            # status.podIP: 100.96.3.2
-            - name: OPERATOR_POD_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.podIP
-            # spec.serviceAccount: {{ include "clickhouseOperator.fullname" . }}
-            # spec.serviceAccountName: {{ include "clickhouseOperator.fullname" . }}
-            - name: OPERATOR_POD_SERVICE_ACCOUNT
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.serviceAccountName
+            {{- include "clickhouseOperator.commonEnv" . | nindent 12 }}
+            {{- with .Values.clickhouseOperator.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          resources:
+            {{- toYaml .Values.clickhouseOperator.resources | nindent 12 }}
 
-            # Container-specific
-            - name: OPERATOR_CONTAINER_CPU_REQUEST
-              valueFrom:
-                resourceFieldRef:
-                  containerName: {{ include "clickhouseOperator.fullname" . }}
-                  resource: requests.cpu
-            - name: OPERATOR_CONTAINER_CPU_LIMIT
-              valueFrom:
-                resourceFieldRef:
-                  containerName: {{ include "clickhouseOperator.fullname" . }}
-                  resource: limits.cpu
-            - name: OPERATOR_CONTAINER_MEM_REQUEST
-              valueFrom:
-                resourceFieldRef:
-                  containerName: {{ include "clickhouseOperator.fullname" . }}
-                  resource: requests.memory
-            - name: OPERATOR_CONTAINER_MEM_LIMIT
-              valueFrom:
-                resourceFieldRef:
-                  containerName: {{ include "clickhouseOperator.fullname" . }}
-                  resource: limits.memory
-
-        - name: {{ include "metricsExporter.fullname" . }}
+        - name: metrics-exporter
           image: {{ include "metricsExporter.image" . }}
           imagePullPolicy: {{ .Values.clickhouseOperator.metricsExporter.image.pullPolicy }}
           volumeMounts:
@@ -147,6 +107,13 @@ spec:
               mountPath: /etc/clickhouse-operator/templates.d
             - name: etc-clickhouse-operator-usersd-folder
               mountPath: /etc/clickhouse-operator/users.d
+          env:
+            {{- include "clickhouseOperator.commonEnv" . | nindent 12 }}
+            {{- with .Values.clickhouseOperator.metricsExporter.env }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           ports:
             - containerPort: {{ .Values.clickhouseOperator.metricsExporter.service.port }}
               name: metrics
+          resources:
+            {{- toYaml .Values.clickhouseOperator.metricsExporter.resources | nindent 12 }}

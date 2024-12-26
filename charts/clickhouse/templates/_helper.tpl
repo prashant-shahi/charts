@@ -92,7 +92,7 @@ Return suffix part of the headless service
 {{- $clusterDomain := default "cluster.local" .Values.global.clusterDomain }}
 {{- $name := printf "%s-headless" (include "clickhouse.zookeeper.servicename" .) }}
 {{- if and $namespace (ne $namespace .Values.namespace) }}
-{{- printf "%s.svc.%s.%s" $name $namespace $clusterDomain }}
+{{- printf "%s.%s.svc.%s" $name $namespace $clusterDomain }}
 {{- else -}}
 {{- $name }}
 {{- end }}
@@ -133,6 +133,20 @@ Return the proper clickhouse image name
 {{- $registryName := default .Values.image.registry .Values.global.imageRegistry -}}
 {{- $repositoryName := .Values.image.repository -}}
 {{- $tag := .Values.image.tag | toString -}}
+{{- if $registryName -}}
+    {{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
+{{- else -}}
+    {{- printf "%s:%s" $repositoryName $tag -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the proper exporter image name
+*/}}
+{{- define "logs.system.image" -}}
+{{- $registryName := default .Values.logs.system.image.registry .Values.global.imageRegistry -}}
+{{- $repositoryName := .Values.logs.system.image.repository -}}
+{{- $tag := .Values.logs.system.image.tag | toString -}}
 {{- if $registryName -}}
     {{- printf "%s/%s:%s" $registryName $repositoryName $tag -}}
 {{- else -}}
@@ -284,3 +298,58 @@ Return the proper metricsExporter image name
     {{- printf "%s:%s" $repositoryName $tag -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Return common environment variables for ClickHouse Operator
+*/}}
+{{- define "clickhouseOperator.commonEnv" -}}
+# Pod-specific
+# spec.nodeName: ip-172-20-52-62.ec2.internal
+- name: OPERATOR_POD_NODE_NAME
+  valueFrom:
+    fieldRef:
+        fieldPath: spec.nodeName
+# metadata.name: clickhouse-operator-6f87589dbb-ftcsf
+- name: OPERATOR_POD_NAME
+  valueFrom:
+    fieldRef:
+        fieldPath: metadata.name
+# metadata.namespace: kube-system
+- name: OPERATOR_POD_NAMESPACE
+  valueFrom:
+    fieldRef:
+        fieldPath: metadata.namespace
+# status.podIP: 100.96.3.2
+- name: OPERATOR_POD_IP
+  valueFrom:
+    fieldRef:
+        fieldPath: status.podIP
+# spec.serviceAccount: {{ include "clickhouseOperator.fullname" . }}
+# spec.serviceAccountName: {{ include "clickhouseOperator.fullname" . }}
+- name: OPERATOR_POD_SERVICE_ACCOUNT
+  valueFrom:
+    fieldRef:
+        fieldPath: spec.serviceAccountName
+
+# Container-specific
+- name: OPERATOR_CONTAINER_CPU_REQUEST
+  valueFrom:
+    resourceFieldRef:
+        containerName: operator
+        resource: requests.cpu
+- name: OPERATOR_CONTAINER_CPU_LIMIT
+  valueFrom:
+    resourceFieldRef:
+        containerName: operator
+        resource: limits.cpu
+- name: OPERATOR_CONTAINER_MEM_REQUEST
+  valueFrom:
+    resourceFieldRef:
+        containerName: operator
+        resource: requests.memory
+- name: OPERATOR_CONTAINER_MEM_LIMIT
+  valueFrom:
+    resourceFieldRef:
+        containerName: operator
+        resource: limits.memory
+{{- end }}

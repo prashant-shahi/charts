@@ -1,3 +1,4 @@
+{{- if .Values.alertmanager.enabled -}}
 {{- $svcClusterPort := .Values.alertmanager.service.clusterPort }}
 apiVersion: apps/v1
 kind: StatefulSet
@@ -5,10 +6,10 @@ metadata:
   name: {{ include "alertmanager.fullname" . }}
   labels:
     {{- include "alertmanager.labels" . | nindent 4 }}
-{{- if .Values.alertmanager.statefulSet.annotations }}
+  {{- if .Values.alertmanager.statefulSet.annotations }}
   annotations:
     {{ toYaml .Values.alertmanager.statefulSet.annotations | nindent 4 }}
-{{- end }}
+  {{- end }}
 spec:
   replicas: {{ .Values.alertmanager.replicaCount }}
   selector:
@@ -76,7 +77,7 @@ spec:
       {{- end }}
       containers:
         {{- if and (.Values.alertmanager.configmapReload.enabled) (.Values.alertmanager.config) }}
-        - name: {{ include "alertmanager.fullname" . }}-{{ .Values.alertmanager.configmapReload.name }}
+        - name: alertmanager-{{ .Values.alertmanager.configmapReload.name }}
           image: "{{ .Values.alertmanager.configmapReload.image.repository }}:{{ .Values.alertmanager.configmapReload.image.tag }}"
           imagePullPolicy: "{{ .Values.alertmanager.configmapReload.image.pullPolicy }}"
           args:
@@ -92,7 +93,7 @@ spec:
             - name: config
               mountPath: /etc/alertmanager
         {{- end }}
-        - name: {{ include "alertmanager.fullname" . }}
+        - name: alertmanager
           securityContext:
             {{- toYaml .Values.alertmanager.securityContext | nindent 12 }}
           image: {{ template "alertmanager.image" . }}
@@ -103,6 +104,10 @@ spec:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: status.podIP
+            {{- range $key, $val := .Values.alertmanager.additionalEnvs }}
+            - name: {{ $key }}
+              value: {{ $val | toYaml }}
+            {{- end }}
           {{- if .Values.alertmanager.command }}
           command:
             {{- toYaml .Values.alertmanager.command | nindent 12 }}
@@ -110,8 +115,8 @@ spec:
           args:
             - --storage.path=/alertmanager
             - --queryService.url=http://{{ include "queryService.internalUrl" . }}
-            {{- if or (gt (int .Values.alertmanager.replicaCount) 1) (.Values.alertmanager.additionalPeers) }}
             - --cluster.advertise-address=$(POD_IP):{{ $svcClusterPort }}
+            {{- if or (gt (int .Values.alertmanager.replicaCount) 1) (.Values.alertmanager.additionalPeers) }}
             - --cluster.listen-address=0.0.0.0:{{ $svcClusterPort }}
             {{- end }}
             {{- if gt (int .Values.alertmanager.replicaCount) 1 }}
@@ -188,3 +193,4 @@ spec:
       {{- end }}
       {{- end }}
   {{- end }}
+{{- end }}

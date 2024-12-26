@@ -5,6 +5,9 @@ metadata:
   labels:
     {{- include "queryService.labels" . | nindent 4 }}
 {{- with .Values.queryService.service }}
+{{- if .labels }}
+    {{- toYaml .labels | nindent 4 }}
+{{- end }}
 {{- if .annotations }}
   annotations:
     {{- toYaml .annotations | nindent 4 }}
@@ -27,6 +30,14 @@ spec:
       targetPort: http-internal
       {{- if (and (eq .type "NodePort") .internalNodePort) }}
       nodePort: {{ .internalNodePort }}
+      {{- end }}
+    - name: opamp-internal
+      port: {{ .opampPort }}
+      {{- include "signoz.service.ifClusterIP" .type | indent 6 }}
+      protocol: TCP
+      targetPort: opamp-internal
+      {{- if eq .type "NodePort" }}
+      nodePort: ""
       {{- end }}
 {{- end }}
   selector:

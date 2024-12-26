@@ -1,9 +1,14 @@
+{{- if .Values.frontend.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "frontend.fullname" . }}
   labels:
     {{- include "frontend.labels" . | nindent 4 }}
+  {{- if .Values.frontend.annotations }}
+  annotations:
+    {{- toYaml .Values.frontend.annotations | nindent 4 }}
+  {{- end }}
 spec:
   {{- if not .Values.frontend.autoscaling.enabled }}
   replicas: {{ .Values.frontend.replicaCount }}
@@ -63,7 +68,7 @@ spec:
             {{- toYaml .Values.frontend.initContainers.init.resources | nindent 12 }}
       {{- end }}
       containers:
-        - name: {{ include "frontend.fullname" . }}
+        - name: frontend
           securityContext:
             {{- toYaml .Values.frontend.securityContext | nindent 12 }}
           image: {{ template "frontend.image" . }}
@@ -92,3 +97,4 @@ spec:
               port: http
           resources:
             {{- toYaml .Values.frontend.resources | nindent 12 }}
+{{- end }}

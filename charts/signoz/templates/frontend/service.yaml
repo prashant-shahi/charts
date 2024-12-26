@@ -1,3 +1,4 @@
+{{- if .Values.frontend.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -5,6 +6,9 @@ metadata:
   labels:
     {{- include "frontend.labels" . | nindent 4 }}
 {{- with .Values.frontend.service }}
+{{- if .labels }}
+    {{- toYaml .labels | nindent 4 }}
+{{- end }}
 {{- if .annotations }}
   annotations:
     {{- toYaml .annotations | nindent 4 }}
@@ -20,3 +24,4 @@ spec:
 {{- end }}
   selector:
     {{- include "frontend.selectorLabels" . | nindent 4 }}
+{{- end }}
